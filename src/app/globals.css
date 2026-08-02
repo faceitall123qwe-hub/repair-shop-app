@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter-tight);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/* Paleta i tokeny designu zostaną dodane po akceptacji planu designu (sekcja 10 briefu). */
+body {
+  font-family: var(--font-sans);
+}
