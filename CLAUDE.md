@@ -71,13 +71,23 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - **Design zatwierdzony** (właściciel: „zrób sam"). Plan z sekcji 10 przyjęty; paleta wpisana
   w tokeny `globals.css` (ink/pcb/signal/paper/surface/steel/line/alert).
 
-## Do uzupełnienia przez właściciela (aktywne placeholdery)
-- **`DATABASE_URL`** + **`DIRECT_URL`** — projekt na supabase.com (region EU/Frankfurt);
-  potrzebne od Fazy 1 do `db:push`/seed.
-- Sekrety: `SESSION_SECRET`, `IP_HASH_SALT`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `CRON_SECRET`.
-- Telegram: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` (Faza 4).
-- Turnstile keys (Faza 2), `RESEND_API_KEY` (Faza 4), `BLOB_READ_WRITE_TOKEN`.
-- **NIP** — po rejestracji JDG. **Dopłata nocna** — ustalić kwotę i okno godzin.
-- Ceny usług w seedzie — do weryfikacji (Faza 1).
+### Faza 1 (schemat + logika)
+- Wszystkie tabele w `public` z **RLS bez polityk (deny-all)**. Połączenie jako `postgres`
+  (właściciel) omija RLS; anon/authenticated dostają 0 wierszy — ochrona danych klientów.
+- ID: app-side **uuidv7** (`src/lib/ids.ts`, `$defaultFn`), bez rozszerzeń Postgresa.
+- Kolumny snake_case przez `casing: "snake_case"` (potwierdzone w `db:push`).
+- Seed idempotentny (`onConflictDoNothing`); zgłoszenia testowe tylko poza production.
+  Ceny w seedzie: placeholdery `// TODO: zweryfikuj ceny`.
+- Skrypty TS przez `node --env-file=.env.local --import tsx` (dev-dep `tsx`).
+- `strict: false` w drizzle.config, aby `db:push` nie wisiał na potwierdzeniu.
 
-Rozwiązane: nazwa, domena, telefon, e-mail, adres bazy + współrzędne, godziny (całodobowo).
+## Do uzupełnienia przez właściciela (aktywne placeholdery)
+- Sekrety: `SESSION_SECRET`, `IP_HASH_SALT` (Faza 2/3), `CRON_SECRET` (Faza 8).
+- **`ADMIN_PASSWORD`** = `<dev-only, see .env.local>` (DEV) — zmień przed produkcją.
+- Telegram: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` (Faza 4).
+- Turnstile keys (Faza 2), `RESEND_API_KEY` (Faza 4), `BLOB_READ_WRITE_TOKEN` (Faza 2/3).
+- **NIP** — po rejestracji JDG. **Dopłata nocna** — ustalić kwotę i okno godzin.
+- **Ceny usług w seedzie** — placeholdery, do potwierdzenia.
+
+Rozwiązane: nazwa, domena, telefon, e-mail, adres bazy + współrzędne, godziny;
+Supabase podłączone, schemat + seed w bazie.
