@@ -12,7 +12,8 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./src/db/migrations",
   dialect: "postgresql",
-  dbCredentials: { url: process.env.DATABASE_URL ?? "" },
+  // Migracje: preferuj DIRECT_URL (session pooler / direct), fallback DATABASE_URL.
+  dbCredentials: { url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "" },
   casing: "snake_case",
   strict: true,
   verbose: true,

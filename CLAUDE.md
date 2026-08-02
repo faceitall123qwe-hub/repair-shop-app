@@ -1,7 +1,17 @@
-# Projekt: {{NAZWA_FIRMY}} — mobilny serwis komputerowy
+# Projekt: SerwisPod Ręką — mobilny serwis komputerowy
 
 Mobilny serwis komputerowy (JDG). Odbiór i dowóz sprzętu gratis w promieniu 50 km od bazy.
 Pełne wymagania: `BRIEF.md`. Pracujemy fazami — po każdej fazie STOP na akceptację właściciela.
+
+## Dane firmy
+- Nazwa: **SerwisPod Ręką** · Domena: **serwispodreka.pl** (jeszcze bez rejestracji/DNS)
+- Telefon: **+48 531 809 749** (E.164: `+48531809749`)
+- E-mail kontaktowy: **serwispodreka@gmail.com** · nadawca maili: `noreply@serwispodreka.pl`
+- Baza/warsztat: **Warszawa (Białołęka)**,
+  współrzędne `52.321, 20.9876` — środek promienia 50 km.
+  **Adresu NIE publikujemy na stronie** (GBP: obszar obsługi zamiast adresu).
+- Godziny: **całodobowo, 7 dni w tygodniu.** Nocą — **dopłata** (kwota/okno: TODO).
+- NIP: brak (JDG jeszcze niezarejestrowana).
 
 ## Komendy
 - `pnpm dev` — serwer deweloperski (Turbopack)
@@ -12,7 +22,7 @@ Pełne wymagania: `BRIEF.md`. Pracujemy fazami — po każdej fazie STOP na akce
 - `pnpm db:seed` — seed (Faza 1) · `pnpm db:anonymize` — anonimizacja RODO (Faza 9)
 
 ## Stack
-Next 16 (App Router, TS strict) · Tailwind v4 · Drizzle ORM + Neon (Postgres) · Zod ·
+Next 16 (App Router, TS strict) · Tailwind v4 · Drizzle ORM + Supabase (Postgres) · Zod ·
 własne sesje admina + @node-rs/argon2 · Resend + react-email · Telegram Bot API ·
 Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Vercel (fra1).
 
@@ -23,8 +33,8 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
   `canTransition()`. Każde przejście zapisuje `ticket_event` w tej samej transakcji.
 - Schematy Zod: `src/lib/validation/` — współdzielone client/server; każdy input walidowany
   po stronie serwera (nawet jeśli walidował klient).
-- Baza: `src/db/` — sterownik **neon-serverless (WebSocket)**, NIE neon-http (ten nie
-  obsługuje interaktywnych transakcji).
+- Baza: `src/db/` — Supabase Postgres, sterownik **postgres.js** z `prepare: false`
+  (pooler transakcyjny Supavisor, 6543). Transakcje interaktywne działają (maszyna stanów).
 
 ## Konwencje
 - Interfejs, treści, komunikaty błędów, dane w bazie: po polsku.
@@ -45,20 +55,29 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - **Auth: własny system sesji** (tabela `sessions` + cookie httpOnly/Secure/SameSite=Lax +
   @node-rs/argon2), BEZ Auth.js. Powód: Auth.js v5 credentials wymusza JWT i nie umie sesji
   w bazie — sprzeczne z briefem. Własne = ~100 linii, mniej zależności, zgodne z modelem danych.
-- **Sterownik Neon: neon-serverless (Pool/WebSocket)** — neon-http nie wspiera transakcji
-  interaktywnych wymaganych przez maszynę stanów.
-- **Dystans: haversine, baza = centrum Warszawy (52.2297, 21.0122), promień 50 km w linii
-  prostej.** Do potwierdzenia, jeśli bazą jest konkretny warsztat poza centrum.
+- **Baza: Supabase Postgres** (zamiast Neon — decyzja właściciela). Sterownik postgres.js,
+  `prepare: false` dla poolera transakcyjnego (6543); migracje przez `DIRECT_URL` (5432).
+- **RLS / Data API (RODO):** tabele z danymi klientów są w schemacie `public`, który Supabase
+  wystawia przez auto-REST (klucz anon). W Fazie 1 włączamy **RLS deny-all** na każdej tabeli
+  (nasze połączenie jako `postgres` omija RLS) lub wyłączamy Data API — inaczej zgłoszenia
+  byłyby czytelne przez publiczny endpoint.
+- **Dystans: haversine, baza = Białołęka (52.321, 20.9876),
+  promień 50 km w linii prostej.** Współrzędne w `BASE_LAT`/`BASE_LNG`.
 - **Formularz bez JS:** jednostronicowy fallback serwerowy (Server Action) + wersja 4-krokowa
   z JS. Turnstile działa tylko w wersji z JS.
 - **Argon2: @node-rs/argon2** (prebuilt, bez kompilacji na Windows) — instalacja w Fazie 3.
 - **Analityka i Playwright/e2e odłożone do Fazy 8.** W Fazie 0 skonfigurowany tylko Vitest.
 - **Prettier + prettier-plugin-tailwindcss** dodane do formatowania.
+- **Design zatwierdzony** (właściciel: „zrób sam"). Plan z sekcji 10 przyjęty; paleta wpisana
+  w tokeny `globals.css` (ink/pcb/signal/paper/surface/steel/line/alert).
 
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
-- Dane firmy: `NAZWA_FIRMY`, `DOMENA`, `TELEFON`, `EMAIL_KONTAKT`, `BAZA_ADRES`, `GODZINY`, `NIP`.
-- `DATABASE_URL` — utwórz projekt na neon.tech (potrzebne od Fazy 1).
+- **`DATABASE_URL`** + **`DIRECT_URL`** — projekt na supabase.com (region EU/Frankfurt);
+  potrzebne od Fazy 1 do `db:push`/seed.
 - Sekrety: `SESSION_SECRET`, `IP_HASH_SALT`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `CRON_SECRET`.
 - Telegram: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` (Faza 4).
-- Turnstile keys (Faza 2), `RESEND_API_KEY` + `EMAIL_FROM` (Faza 4), `BLOB_READ_WRITE_TOKEN`.
-- Weryfikacja: baza = centrum Warszawy czy konkretny warsztat? Ceny usług w seedzie (Faza 1).
+- Turnstile keys (Faza 2), `RESEND_API_KEY` (Faza 4), `BLOB_READ_WRITE_TOKEN`.
+- **NIP** — po rejestracji JDG. **Dopłata nocna** — ustalić kwotę i okno godzin.
+- Ceny usług w seedzie — do weryfikacji (Faza 1).
+
+Rozwiązane: nazwa, domena, telefon, e-mail, adres bazy + współrzędne, godziny (całodobowo).
