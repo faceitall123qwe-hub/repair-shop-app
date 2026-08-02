@@ -4,9 +4,21 @@
   --font-sans: var(--font-inter-tight);
   --font-display: var(--font-bricolage);
   --font-mono: var(--font-jetbrains-mono);
+
+  /* Paleta „protokół serwisowy" — zatwierdzona (sekcja 10 briefu) */
+  --color-ink: #10161c;
+  --color-pcb: #0f5c42;
+  --color-pcb-700: #0b4632;
+  --color-signal: #f0a821;
+  --color-paper: #eceeea;
+  --color-surface: #f5f6f3;
+  --color-steel: #6b7a88;
+  --color-line: #d5dad6;
+  --color-alert: #c0392b;
 }
 
-/* Paleta i tokeny designu zostaną dodane po akceptacji planu designu (sekcja 10 briefu). */
 body {
+  background: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-sans);
 }

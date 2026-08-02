@@ -21,7 +21,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "{{NAZWA_FIRMY}} — mobilny serwis komputerowy",
+  title: "SerwisPod Ręką — mobilny serwis komputerowy",
   description:
     "Mobilny serwis komputerowy — odbiór i dowóz sprzętu gratis w promieniu 50 km od bazy.",
 };
