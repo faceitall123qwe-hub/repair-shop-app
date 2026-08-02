@@ -15,6 +15,5 @@ export default defineConfig({
   // Migracje: preferuj DIRECT_URL (session pooler / direct), fallback DATABASE_URL.
   dbCredentials: { url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "" },
   casing: "snake_case",
-  strict: true,
   verbose: true,
 });
