@@ -93,6 +93,17 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
   komponenty w `app/` używają aliasu `@/`.
 - Skrypty tsx muszą mieć `main()` (tsx kompiluje .ts do CJS — brak top-level await).
 
+### Faza 3 (panel admina)
+- Auth: **własne sesje** (`src/lib/auth.ts`) — losowy token w tabeli `sessions`, cookie httpOnly.
+  Guard dwustopniowy: `proxy.ts` (obecność ciasteczka) + `requireUser()` w chronionym layoucie.
+- Trasy: grupa `(app)` (guard + nav) vs `/panel/login` poza nią. `middleware`→`proxy.ts` (Next 16).
+- Mutacje w `src/services/tickets.ts` — `updateTicketStatus`/`setQuote`/`updateNotes`: transakcja +
+  `ticket_event`, `canTransition`, gaty ceny (WYCENA_WYSLANA, ZAKONCZONE). Terminale zablokowane.
+- **Bez shadcn/ui** — panel na czystym Tailwind + tokeny (uniknięcie konfliktu z tokenami designu
+  i zależności Radix). Jeśli właściciel woli shadcn — do zmiany.
+- Ceny w panelu wpisywane w zł, konwertowane do groszy w akcji. Panel mobile-first.
+- **Odłożone (świadomie):** upload zdjęć (Vercel Blob), CRUD usług/obszarów/ustawień.
+
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
 - **DEV-sekrety ustawione** w `.env.local` (`SESSION_SECRET`, `IP_HASH_SALT`,
   `ADMIN_PASSWORD=<dev-only, see .env.local>`, testowe klucze Turnstile) — **wszystkie do wymiany przed produkcją**.
@@ -102,4 +113,4 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - **Ceny usług w seedzie** — placeholdery, do potwierdzenia.
 - Produkcyjne klucze Turnstile + pełniejszy `data/kody-pocztowe.json` przed produkcją.
 
-Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia end-to-end.
+Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia, panel admina (auth + obsługa zgłoszeń).

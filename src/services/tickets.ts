@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
   type NewTicket,
@@ -9,6 +9,7 @@ import {
 import { baseCoord, classifyArea, haversineKm } from "../lib/distance";
 import { formatTicketCode, generateTrackingToken } from "../lib/ids";
 import { lookupPostalCode } from "../lib/postal-codes";
+import { canTransition, type TicketStatus } from "../lib/ticket-state";
 import { normalizePhonePl, type TicketFormInput } from "../lib/validation/ticket";
 
 type TicketSource = NonNullable<NewTicket["source"]>;
@@ -102,5 +103,88 @@ export async function createTicket(
     });
 
     return { id: ticket!.id, code, trackingToken, distanceKm, inServiceArea };
+  });
+}
+
+export class TicketError extends Error {}
+
+// Zmiana statusu — jedyne miejsce. Waliduje przejście i wymóg ceny, zapisuje event.
+export async function updateTicketStatus(
+  ticketId: string,
+  toStatus: TicketStatus,
+  actor: string,
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    const [t] = await tx
+      .select({
+        status: tickets.status,
+        estMin: tickets.estimatedPriceMin,
+        estMax: tickets.estimatedPriceMax,
+        finalPrice: tickets.finalPrice,
+      })
+      .from(tickets)
+      .where(eq(tickets.id, ticketId))
+      .for("update");
+    if (!t) throw new TicketError("Nie znaleziono zgłoszenia.");
+    if (!canTransition(t.status, toStatus)) {
+      throw new TicketError(`Niedozwolone przejście: ${t.status} → ${toStatus}.`);
+    }
+    if (toStatus === "WYCENA_WYSLANA" && (t.estMin == null || t.estMax == null)) {
+      throw new TicketError("Ustaw widełki wyceny przed jej wysłaniem.");
+    }
+    if (toStatus === "ZAKONCZONE" && t.finalPrice == null) {
+      throw new TicketError("Ustaw cenę finalną przed zakończeniem.");
+    }
+    const closed = toStatus === "ZAKONCZONE" || toStatus === "ANULOWANE";
+    await tx
+      .update(tickets)
+      .set({ status: toStatus, ...(closed ? { closedAt: new Date() } : {}) })
+      .where(eq(tickets.id, ticketId));
+    await tx.insert(ticketEvents).values({
+      ticketId,
+      type: "STATUS_CHANGE",
+      fromStatus: t.status,
+      toStatus,
+      actor,
+    });
+  });
+}
+
+export type QuoteInput = {
+  estimatedPriceMin?: number | null;
+  estimatedPriceMax?: number | null;
+  finalPrice?: number | null;
+  partsCost?: number | null;
+};
+
+export async function setQuote(
+  ticketId: string,
+  quote: QuoteInput,
+  actor: string,
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx.update(tickets).set(quote).where(eq(tickets.id, ticketId));
+    await tx.insert(ticketEvents).values({
+      ticketId,
+      type: "PRICE_SET",
+      payload: quote,
+      actor,
+    });
+  });
+}
+
+export async function updateNotes(
+  ticketId: string,
+  notes: { publicNote?: string | null; internalNote?: string | null },
+  actor: string,
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx.update(tickets).set(notes).where(eq(tickets.id, ticketId));
+    await tx.insert(ticketEvents).values({
+      ticketId,
+      type: "NOTE",
+      payload: notes,
+      actor,
+    });
   });
 }
