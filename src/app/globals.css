@@ -12,7 +12,7 @@
   --color-signal: #f0a821;
   --color-paper: #eceeea;
   --color-surface: #f5f6f3;
-  --color-steel: #6b7a88;
+  --color-steel: #5b6570;
   --color-line: #d5dad6;
   --color-alert: #c0392b;
 }
@@ -21,4 +21,39 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reveal {
+  animation: reveal 0.55s ease both;
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.15) rotate(-4deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stamp {
+  animation: stamp 0.4s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .stamp {
+    animation: none;
+  }
 }
