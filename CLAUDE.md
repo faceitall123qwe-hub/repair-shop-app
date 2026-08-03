@@ -118,6 +118,15 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - **Live outbound niesprawdzony** — wymaga `RESEND_API_KEY` + `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`;
   webhook (inbound) wymaga publicznego URL i `setWebhook` po deployu.
 
+### Faza 5 (śledzenie klienta)
+- `/status` — lookup kod + 4 cyfry telefonu: rate-limit 5/15 min, **stały czas odpowiedzi** (próg
+  500 ms, brak wycieku przez timing); po sukcesie redirect na `/status/[token]`.
+- `/status/[token]` — widok z linku e-mail; oś czasu (STATUS_CHANGE → `clientDescription`),
+  `publicNote`, wycena, akceptacja/rezygnacja. Reużyta `KartaZgloszenia`.
+- `src/services/tracking.ts` — SELECT tylko bezpiecznych pól (bez `internalNote`/`partsCost`/`ipHash`).
+- Akceptacja/rezygnacja → `updateTicketStatus` (WYCENA_WYSLANA → W_NAPRAWIE / ODRZUCONA_WYCENA) +
+  `notifyQuoteDecision` (Telegram do właściciela). Token = autoryzacja.
+
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
 - **DEV-sekrety ustawione** w `.env.local` (`SESSION_SECRET`, `IP_HASH_SALT`,
   `ADMIN_PASSWORD=<dev-only, see .env.local>`, testowe klucze Turnstile) — **wszystkie do wymiany przed produkcją**.
@@ -127,4 +136,5 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - **Ceny usług w seedzie** — placeholdery, do potwierdzenia.
 - Produkcyjne klucze Turnstile + pełniejszy `data/kody-pocztowe.json` przed produkcją.
 
-Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia, panel admina (auth + obsługa zgłoszeń).
+Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia, panel admina,
+powiadomienia (kod + szablony), śledzenie klienta + akceptacja wyceny.
