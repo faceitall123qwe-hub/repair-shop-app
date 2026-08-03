@@ -7,7 +7,7 @@ export function Cta({ title }: { title?: string }) {
       <h2 className="font-display text-2xl font-semibold">
         {title ?? "Nie działa? Zgłoś — przyjadę po sprzęt."}
       </h2>
-      <p className="text-paper/70 mx-auto mt-2 max-w-md text-sm">
+      <p className="text-paper/90 mx-auto mt-2 max-w-md text-sm">
         Odbiór i dowóz gratis w promieniu {company.radiusKm} km. Płacisz przy odbiorze — gotówka,
         BLIK, przelew.
       </p>

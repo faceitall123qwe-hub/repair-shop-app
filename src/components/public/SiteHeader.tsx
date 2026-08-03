@@ -23,7 +23,7 @@ export function SiteHeader() {
             <Link
               key={n.href}
               href={n.href}
-              className="text-steel hover:text-ink text-sm"
+              className="text-steel hover:text-ink px-1 py-2 text-sm"
             >
               {n.label}
             </Link>

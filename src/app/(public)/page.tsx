@@ -82,7 +82,7 @@ export default function Home() {
         <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(([n, t, d]) => (
             <li key={n} className="border-line bg-surface rounded-sm border p-4">
-              <p className="text-signal font-mono text-sm">{n}</p>
+              <p className="text-pcb font-mono text-sm">{n}</p>
               <p className="mt-1 font-medium">{t}</p>
               <p className="text-steel mt-1 text-sm">{d}</p>
             </li>

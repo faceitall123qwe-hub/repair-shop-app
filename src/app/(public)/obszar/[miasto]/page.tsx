@@ -2,10 +2,12 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/JsonLd";
 import { Cta } from "@/components/public/Cta";
 import { company } from "@/config/company";
 import { db } from "@/db";
 import { serviceAreas } from "@/db/schema";
+import { breadcrumbJsonLd } from "@/lib/jsonld";
 
 export async function generateStaticParams() {
   const rows = await db
@@ -55,6 +57,13 @@ export default async function Page({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Strona główna", url: "/" },
+          { name: "Obszar obsługi", url: "/obszar" },
+          { name: a.name, url: `/obszar/${miasto}` },
+        ])}
+      />
       <Link href="/obszar" className="text-steel text-sm">
         ‹ Obszar obsługi
       </Link>

@@ -14,23 +14,23 @@ export function SiteFooter() {
         </div>
         <div className="text-sm">
           <p className="text-steel font-mono text-xs uppercase">Kontakt</p>
-          <a href={`tel:${company.phone}`} className="mt-2 block font-mono">
+          <a href={`tel:${company.phone}`} className="mt-2 block py-1 font-mono">
             {company.phoneDisplay}
           </a>
-          <a href={`mailto:${company.email}`} className="block">
+          <a href={`mailto:${company.email}`} className="block py-1">
             {company.email}
           </a>
           <p className="text-steel mt-1">{company.hours}</p>
         </div>
         <nav className="text-sm">
           <p className="text-steel font-mono text-xs uppercase">Informacje</p>
-          <Link href="/o-mnie" className="mt-2 block">
+          <Link href="/o-mnie" className="mt-2 block py-1">
             O mnie
           </Link>
-          <Link href="/polityka-prywatnosci" className="block">
+          <Link href="/polityka-prywatnosci" className="block py-1">
             Polityka prywatności
           </Link>
-          <Link href="/regulamin" className="block">
+          <Link href="/regulamin" className="block py-1">
             Regulamin
           </Link>
         </nav>

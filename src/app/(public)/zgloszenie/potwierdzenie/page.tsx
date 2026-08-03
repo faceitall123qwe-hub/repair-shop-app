@@ -22,7 +22,7 @@ export default async function Page({
       </h1>
 
       {code && (
-        <div className="border-line bg-surface mt-6 rounded-sm border p-4">
+        <div className="stamp border-line bg-surface mt-6 rounded-sm border p-4">
           <p className="text-steel font-mono text-xs uppercase">Numer zlecenia</p>
           <p className="font-mono text-2xl">{code}</p>
         </div>

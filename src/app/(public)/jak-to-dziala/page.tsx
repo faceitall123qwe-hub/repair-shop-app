@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
 import { Cta } from "@/components/public/Cta";
 import { company } from "@/config/company";
+import { faqJsonLd } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Jak to działa — odbiór i dowóz sprzętu | SerwisPod Ręką",
@@ -26,6 +28,7 @@ const FAQ: [string, string][] = [
 export default function Page() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <JsonLd data={faqJsonLd(FAQ.map(([q, a]) => ({ q, a })))} />
       <p className="text-pcb font-mono text-xs">JAK TO DZIAŁA</p>
       <h1 className="font-display mt-2 text-3xl font-semibold">Cztery kroki, zero dojazdów z Twojej strony</h1>
       <p className="text-steel mt-3">
@@ -36,7 +39,7 @@ export default function Page() {
       <ol className="mt-8 space-y-4">
         {STEPS.map(([n, t, d]) => (
           <li key={n} className="border-line bg-surface flex gap-4 rounded-sm border p-4">
-            <span className="text-signal font-mono text-lg">{n}</span>
+            <span className="text-pcb font-mono text-lg">{n}</span>
             <div>
               <p className="font-medium">{t}</p>
               <p className="text-steel mt-1 text-sm">{d}</p>

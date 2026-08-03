@@ -2,10 +2,12 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/JsonLd";
 import { Cta } from "@/components/public/Cta";
 import { db } from "@/db";
 import { services } from "@/db/schema";
 import { formatPriceFrom } from "@/lib/format";
+import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/jsonld";
 import { DEVICE_TYPE_LABELS, SERVICE_CATEGORY_LABELS } from "@/lib/labels";
 
 export async function generateStaticParams() {
@@ -53,6 +55,22 @@ export default async function Page({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <JsonLd
+        data={serviceJsonLd({
+          name: s.name,
+          shortDesc: s.shortDesc,
+          slug: s.slug,
+          priceFromGrosze: s.priceFromGrosze,
+        })}
+      />
+      {faq.length > 0 && <JsonLd data={faqJsonLd(faq)} />}
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Strona główna", url: "/" },
+          { name: "Usługi", url: "/uslugi" },
+          { name: s.name, url: `/uslugi/${s.slug}` },
+        ])}
+      />
       <Link href="/uslugi" className="text-steel text-sm">
         ‹ Usługi
       </Link>

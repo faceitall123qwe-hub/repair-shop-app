@@ -135,6 +135,17 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - Mapa `/obszar` — keyless Google Maps embed (bez API key i zależności).
 - `/kontakt` — uproszczony formularz → Telegram do właściciela (gdy skonfigurowany); honeypot + Turnstile + rate-limit.
 
+### Faza 7 (SEO, dostępność, wydajność)
+- JSON-LD: `ComputerRepairService` (GeoCircle 50 km, 24/7) na każdej stronie publicznej;
+  `Service` + `FAQPage` + `BreadcrumbList` na usługach; `FAQPage` na jak-to-dziala; breadcrumb na miastach.
+- `sitemap.ts` + `robots.ts` (dynamiczne z DB; `/panel`, `/status`, `/api` wykluczone). `metadataBase`.
+- A11y: kontrast podbity (`--color-steel` #5b6570, numery kroków `text-pcb`, CTA `text-paper/90`),
+  tap-targety w nagłówku/stopce. Mono-font `preload: false` (LCP).
+- **Lighthouse (mobile, lokalny `next start`): a11y 100, best-practices 100, SEO 100, performance 86**
+  (CLS 0.004). Perf ograniczony LCP ~4 s pod symulacją slow-4G/4×CPU na localhoście — artefakt lokalny;
+  na Vercel (CDN/Brotli/HTTP2) oczekiwane ≥95. Ostateczny pomiar po deployu (Faza 8).
+- **OG images odłożone** — satori wymaga bundla fontu z polskimi glifami; do zrobienia w Fazie 8.
+
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
 - **DEV-sekrety ustawione** w `.env.local` (`SESSION_SECRET`, `IP_HASH_SALT`,
   `ADMIN_PASSWORD=<dev-only, see .env.local>`, testowe klucze Turnstile) — **wszystkie do wymiany przed produkcją**.
@@ -147,4 +158,4 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - Produkcyjne klucze Turnstile + pełniejszy `data/kody-pocztowe.json` przed produkcją.
 
 Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia, panel admina,
-powiadomienia (kod + szablony), śledzenie klienta, strony publiczne.
+powiadomienia (kod + szablony), śledzenie klienta, strony publiczne, SEO + a11y (Lighthouse a11y/BP/SEO 100).

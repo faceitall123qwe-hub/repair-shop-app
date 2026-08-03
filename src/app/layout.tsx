@@ -18,9 +18,11 @@ const mono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin", "latin-ext"],
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: "SerwisPod Ręką — mobilny serwis komputerowy",
   description:
     "Mobilny serwis komputerowy — odbiór i dowóz sprzętu gratis w promieniu 50 km od bazy.",
