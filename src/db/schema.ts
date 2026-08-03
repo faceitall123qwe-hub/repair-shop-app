@@ -1,6 +1,7 @@
 import {
   boolean,
   date,
+  index,
   integer,
   jsonb,
   numeric,
@@ -230,6 +231,23 @@ export const notificationLog = pgTable("notification_log", {
   error: text(),
   sentAt: timestamp({ withTimezone: true }),
   createdAt: created(),
+}).enableRLS();
+
+// ── rate_limits — okno czasowe w Postgresie (bez Redisa) ──
+export const rateLimits = pgTable(
+  "rate_limits",
+  {
+    id: pk(),
+    key: text().notNull(),
+    createdAt: created(),
+  },
+  (t) => [index("rate_limits_key_created_idx").on(t.key, t.createdAt)],
+).enableRLS();
+
+// ── ticket_counters — transakcyjny licznik kodów zleceń per rok ──
+export const ticketCounters = pgTable("ticket_counters", {
+  year: integer().primaryKey(),
+  lastSeq: integer().notNull().default(0),
 }).enableRLS();
 
 export type Ticket = typeof tickets.$inferSelect;

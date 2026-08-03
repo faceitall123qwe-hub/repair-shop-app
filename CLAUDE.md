@@ -81,13 +81,25 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - Skrypty TS przez `node --env-file=.env.local --import tsx` (dev-dep `tsx`).
 - `strict: false` w drizzle.config, aby `db:push` nie wisiał na potwierdzeniu.
 
+### Faza 2 (formularz zgłoszenia)
+- `createTicket` (`src/services/tickets.ts`) — jedyne miejsce tworzenia zgłoszenia; transakcja
+  (ticket + ticket_event), kod `SRV-RRRR-NNNN` przez atomowy licznik `ticket_counters`.
+- Server Action `submitTicket` z progresywnym wzbogaceniem — działa też bez JS (Next renderuje
+  formularz jako MPA-action). Wersja 4-krokowa tylko z JS (jeden `<form>`, kroki ukrywane atrybutem).
+- Anty-spam: honeypot + minimalny czas (JS) + Turnstile (gdy token) + rate-limit 3/h/IP-hash
+  w tabeli `rate_limits` (przesuwane okno, bez Redisa).
+- Dystans z lokalnego `data/kody-pocztowe.json` (bez API na hot path); nieznany kod → `inServiceArea=null`.
+- Moduły w `src/lib` i `src/services` używają importów **względnych** (działają pod tsx/skryptami);
+  komponenty w `app/` używają aliasu `@/`.
+- Skrypty tsx muszą mieć `main()` (tsx kompiluje .ts do CJS — brak top-level await).
+
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
-- Sekrety: `SESSION_SECRET`, `IP_HASH_SALT` (Faza 2/3), `CRON_SECRET` (Faza 8).
-- **`ADMIN_PASSWORD`** = `<dev-only, see .env.local>` (DEV) — zmień przed produkcją.
+- **DEV-sekrety ustawione** w `.env.local` (`SESSION_SECRET`, `IP_HASH_SALT`,
+  `ADMIN_PASSWORD=<dev-only, see .env.local>`, testowe klucze Turnstile) — **wszystkie do wymiany przed produkcją**.
 - Telegram: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` (Faza 4).
-- Turnstile keys (Faza 2), `RESEND_API_KEY` (Faza 4), `BLOB_READ_WRITE_TOKEN` (Faza 2/3).
+- `RESEND_API_KEY` (Faza 4), `BLOB_READ_WRITE_TOKEN` (Faza 3), `CRON_SECRET` (Faza 8).
 - **NIP** — po rejestracji JDG. **Dopłata nocna** — ustalić kwotę i okno godzin.
 - **Ceny usług w seedzie** — placeholdery, do potwierdzenia.
+- Produkcyjne klucze Turnstile + pełniejszy `data/kody-pocztowe.json` przed produkcją.
 
-Rozwiązane: nazwa, domena, telefon, e-mail, adres bazy + współrzędne, godziny;
-Supabase podłączone, schemat + seed w bazie.
+Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia end-to-end.
