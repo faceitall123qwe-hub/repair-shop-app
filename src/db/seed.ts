@@ -1,4 +1,5 @@
 import { hash } from "@node-rs/argon2";
+import { sql } from "drizzle-orm";
 import { haversineKm } from "../lib/distance";
 import { formatTicketCode, generateTrackingToken } from "../lib/ids";
 import { db } from "./index";
@@ -7,6 +8,7 @@ import {
   adminUsers,
   serviceAreas,
   services,
+  ticketCounters,
   tickets,
 } from "./schema";
 
@@ -118,6 +120,13 @@ async function main() {
     ].map((t) => ({ ...t, consentRodo: true, trackingToken: generateTrackingToken() }));
 
     await db.insert(tickets).values(sample).onConflictDoNothing({ target: tickets.code });
+    await db
+      .insert(ticketCounters)
+      .values({ year: 2026, lastSeq: sample.length })
+      .onConflictDoUpdate({
+        target: ticketCounters.year,
+        set: { lastSeq: sql`greatest(${ticketCounters.lastSeq}, ${sample.length})` },
+      });
     console.log(`Zgłoszenia testowe: ${sample.length}`);
   }
 
