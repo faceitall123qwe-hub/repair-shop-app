@@ -11,6 +11,7 @@ import { formatTicketCode, generateTrackingToken } from "../lib/ids";
 import { lookupPostalCode } from "../lib/postal-codes";
 import { canTransition, type TicketStatus } from "../lib/ticket-state";
 import { normalizePhonePl, type TicketFormInput } from "../lib/validation/ticket";
+import { notifyNewTicket, notifyStatusChange } from "./notifications";
 
 type TicketSource = NonNullable<NewTicket["source"]>;
 
@@ -51,7 +52,7 @@ export async function createTicket(
   const year = new Date().getFullYear();
   const trackingToken = generateTrackingToken();
 
-  return await db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     // Transakcyjny numer kolejny per rok (atomowy upsert-increment).
     const [counter] = await tx
       .insert(ticketCounters)
@@ -104,6 +105,18 @@ export async function createTicket(
 
     return { id: ticket!.id, code, trackingToken, distanceKm, inServiceArea };
   });
+
+  await runSafely(() => notifyNewTicket(result.id));
+  return result;
+}
+
+// Powiadomienia poza transakcją i fail-safe: ich błąd nie wywala operacji biznesowej.
+async function runSafely(fn: () => Promise<void>): Promise<void> {
+  try {
+    await fn();
+  } catch (e) {
+    console.error("Powiadomienie nie powiodło się:", e);
+  }
 }
 
 export class TicketError extends Error {}
@@ -148,6 +161,8 @@ export async function updateTicketStatus(
       actor,
     });
   });
+
+  await runSafely(() => notifyStatusChange(ticketId, toStatus));
 }
 
 export type QuoteInput = {

@@ -104,6 +104,20 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - Ceny w panelu wpisywane w zł, konwertowane do groszy w akcji. Panel mobile-first.
 - **Odłożone (świadomie):** upload zdjęć (Vercel Blob), CRUD usług/obszarów/ustawień.
 
+### Faza 4 (powiadomienia)
+- E-mail: Resend + react-email; 5 szablonów (`src/emails/templates.tsx`), render HTML + plain-text,
+  stopka RODO. `sendEmail` z retry 1×, **fail-safe** (nie rzuca). `notification_log` na każdą próbę.
+- Telegram: `src/lib/notifications/telegram/client.ts` (Bot API); powiadomienie o nowym zgłoszeniu
+  z inline buttons; webhook `/api/telegram/webhook` (weryfikacja `X-Telegram-Bot-Api-Secret-Token`,
+  `callback_query` → status przez ten sam serwis; komendy `/dzis`, `/nowe`, `/szukaj`).
+- Wyzwalanie: `notifyNewTicket` w `createTicket`, `notifyStatusChange` w `updateTicketStatus` —
+  **po transakcji, w `runSafely`** (błąd powiadomienia nie wywala operacji).
+- Cron: `/api/cron/daily-brief` (weryfikacja `CRON_SECRET`); `vercel.json` `0 7 * * *`
+  (UTC — ~8:00/9:00 Warszawa zależnie od DST).
+- Szablony w `src/emails/` (nie w root `emails/` — czystsze importy). Render zweryfikowany.
+- **Live outbound niesprawdzony** — wymaga `RESEND_API_KEY` + `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`;
+  webhook (inbound) wymaga publicznego URL i `setWebhook` po deployu.
+
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
 - **DEV-sekrety ustawione** w `.env.local` (`SESSION_SECRET`, `IP_HASH_SALT`,
   `ADMIN_PASSWORD=<dev-only, see .env.local>`, testowe klucze Turnstile) — **wszystkie do wymiany przed produkcją**.
