@@ -127,6 +127,14 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - Akceptacja/rezygnacja → `updateTicketStatus` (WYCENA_WYSLANA → W_NAPRAWIE / ODRZUCONA_WYCENA) +
   `notifyQuoteDecision` (Telegram do właściciela). Token = autoryzacja.
 
+### Faza 6 (strony publiczne)
+- Wszystkie trasy z treścią PL, **zero lorem**: `/`, `/uslugi` (+`[slug]`), `/cennik`, `/jak-to-dziala`,
+  `/obszar` (+`[miasto]`), `/o-mnie`, `/kontakt`, `/polityka-prywatnosci`, `/regulamin`.
+- Katalog/cennik z DB. Strony usług (24) i miejscowości (18) **prerenderowane SSG**
+  (`generateStaticParams` — build łączy się z Supabase). Każde miasto ma unikalny `customIntro`.
+- Mapa `/obszar` — keyless Google Maps embed (bez API key i zależności).
+- `/kontakt` — uproszczony formularz → Telegram do właściciela (gdy skonfigurowany); honeypot + Turnstile + rate-limit.
+
 ## Do uzupełnienia przez właściciela (aktywne placeholdery)
 - **DEV-sekrety ustawione** w `.env.local` (`SESSION_SECRET`, `IP_HASH_SALT`,
   `ADMIN_PASSWORD=<dev-only, see .env.local>`, testowe klucze Turnstile) — **wszystkie do wymiany przed produkcją**.
@@ -134,7 +142,9 @@ Vercel Blob · Cloudflare Turnstile · Vitest + Playwright · pnpm · hosting Ve
 - `RESEND_API_KEY` (Faza 4), `BLOB_READ_WRITE_TOKEN` (Faza 3), `CRON_SECRET` (Faza 8).
 - **NIP** — po rejestracji JDG. **Dopłata nocna** — ustalić kwotę i okno godzin.
 - **Ceny usług w seedzie** — placeholdery, do potwierdzenia.
+- **Treści z placeholderami:** `o-mnie` (doświadczenie, lata), `polityka`/`regulamin`
+  (`{{NIP}}`, `{{ADRES_FIRMY}}`, `{{DATA}}`, `{{OKRES_GWARANCJI}}`) — uzupełnić przed publikacją.
 - Produkcyjne klucze Turnstile + pełniejszy `data/kody-pocztowe.json` przed produkcją.
 
 Rozwiązane: dane firmy, Supabase, schemat + seed, formularz zgłoszenia, panel admina,
-powiadomienia (kod + szablony), śledzenie klienta + akceptacja wyceny.
+powiadomienia (kod + szablony), śledzenie klienta, strony publiczne.

@@ -53,25 +53,31 @@ const SERVICES: NewService[] = [
   { slug: "wymiana-baterii-tel", name: "Wymiana baterii w telefonie", category: "TELEFONY", shortDesc: "Wymiana zużytej baterii telefonu.", priceFromGrosze: 12000, priceNote: "od + części", turnaround: "24–48 h", deviceTypes: ["IPHONE", "ANDROID"], isPopular: true, sortOrder: 62 },
 ];
 
-const AREAS: { name: string; slug: string; lat: number; lng: number }[] = [
-  { name: "Warszawa", slug: "warszawa", lat: 52.2297, lng: 21.0122 },
-  { name: "Białołęka", slug: "bialoleka", lat: 52.321, lng: 20.9876 },
-  { name: "Legionowo", slug: "legionowo", lat: 52.4022, lng: 20.9265 },
-  { name: "Marki", slug: "marki", lat: 52.32, lng: 21.1067 },
-  { name: "Ząbki", slug: "zabki", lat: 52.2918, lng: 21.1447 },
-  { name: "Zielonka", slug: "zielonka", lat: 52.303, lng: 21.167 },
-  { name: "Kobyłka", slug: "kobylka", lat: 52.33, lng: 21.2 },
-  { name: "Wołomin", slug: "wolomin", lat: 52.345, lng: 21.242 },
-  { name: "Radzymin", slug: "radzymin", lat: 52.4155, lng: 21.1786 },
-  { name: "Nieporęt", slug: "nieporet", lat: 52.427, lng: 21.0 },
-  { name: "Jabłonna", slug: "jablonna", lat: 52.373, lng: 20.92 },
-  { name: "Łomianki", slug: "lomianki", lat: 52.333, lng: 20.883 },
-  { name: "Wieliszew", slug: "wieliszew", lat: 52.44, lng: 20.99 },
-  { name: "Nowy Dwór Mazowiecki", slug: "nowy-dwor-mazowiecki", lat: 52.437, lng: 20.715 },
-  { name: "Serock", slug: "serock", lat: 52.514, lng: 21.064 },
-  { name: "Sulejówek", slug: "sulejowek", lat: 52.247, lng: 21.267 },
-  { name: "Otwock", slug: "otwock", lat: 52.105, lng: 21.261 },
-  { name: "Pruszków", slug: "pruszkow", lat: 52.17, lng: 20.812 },
+const AREAS: {
+  name: string;
+  slug: string;
+  lat: number;
+  lng: number;
+  customIntro: string;
+}[] = [
+  { name: "Warszawa", slug: "warszawa", lat: 52.2297, lng: 21.0122, customIntro: "Obsługuję całą Warszawę — od Białołęki po Ursynów. Najczęściej odbieram sprzęt spod domu lub pracy po południu." },
+  { name: "Białołęka", slug: "bialoleka", lat: 52.321, lng: 20.9876, customIntro: "Białołęka to moja baza. Dojazd jest tu najszybszy, a odbiór często możliwy jeszcze tego samego dnia." },
+  { name: "Legionowo", slug: "legionowo", lat: 52.4022, lng: 20.9265, customIntro: "Do Legionowa jeżdżę regularnie trasą przez Jabłonnę. Odbiór i dowóz bez dopłat, w oknie które Ci pasuje." },
+  { name: "Marki", slug: "marki", lat: 52.32, lng: 21.1067, customIntro: "Marki leżą tuż przy Warszawie — krótki dojazd, sprzęt odbieram i odwożę bez dodatkowych kosztów." },
+  { name: "Ząbki", slug: "zabki", lat: 52.2918, lng: 21.1447, customIntro: "Ząbki mam praktycznie po drodze z bazy. Umówimy odbiór na dogodną porę, także wieczorem." },
+  { name: "Zielonka", slug: "zielonka", lat: 52.303, lng: 21.167, customIntro: "Zielonka i okolice — spokojny dojazd, odbiór laptopa czy komputera prosto spod domu." },
+  { name: "Kobyłka", slug: "kobylka", lat: 52.33, lng: 21.2, customIntro: "Do Kobyłki dojeżdżam trasą przez Zielonkę. Odbiór i zwrot sprzętu bez dopłat w strefie gratis." },
+  { name: "Wołomin", slug: "wolomin", lat: 52.345, lng: 21.242, customIntro: "Wołomin obsługuję regularnie — odbiorę sprzęt spod domu i przywiozę po naprawie, bez kosztów dojazdu." },
+  { name: "Radzymin", slug: "radzymin", lat: 52.4155, lng: 21.1786, customIntro: "Radzymin jest w zasięgu strefy gratis. Umówimy wygodne okno odbioru, także po pracy." },
+  { name: "Nieporęt", slug: "nieporet", lat: 52.427, lng: 21.0, customIntro: "Nieporęt i okolice Zalewu Zegrzyńskiego — dojazd bez dopłat, odbiór o umówionej porze." },
+  { name: "Jabłonna", slug: "jablonna", lat: 52.373, lng: 20.92, customIntro: "Jabłonna leży po drodze do Legionowa — szybki dojazd i odbiór sprzętu spod domu." },
+  { name: "Łomianki", slug: "lomianki", lat: 52.333, lng: 20.883, customIntro: "Łomianki obsługuję od strony Białołęki. Odbiór i dowóz w strefie gratis, bez ukrytych kosztów." },
+  { name: "Wieliszew", slug: "wieliszew", lat: 52.44, lng: 20.99, customIntro: "Do Wieliszewa dojeżdżam trasą przez Nieporęt. Sprzęt odbieram i odwożę bez dopłat." },
+  { name: "Nowy Dwór Mazowiecki", slug: "nowy-dwor-mazowiecki", lat: 52.437, lng: 20.715, customIntro: "Nowy Dwór Mazowiecki jest w zasięgu — umówimy odbiór z wyprzedzeniem, żeby dojazd był sprawny." },
+  { name: "Serock", slug: "serock", lat: 52.514, lng: 21.064, customIntro: "Serock nad Zalewem Zegrzyńskim — dojeżdżam w strefie gratis, odbiór o dogodnej porze." },
+  { name: "Sulejówek", slug: "sulejowek", lat: 52.247, lng: 21.267, customIntro: "Sulejówek obsługuję od strony Warszawy. Odbiór laptopa czy PC spod domu, bez kosztów dojazdu." },
+  { name: "Otwock", slug: "otwock", lat: 52.105, lng: 21.261, customIntro: "Do Otwocka dojeżdżam przez południową Warszawę. Odbiór i zwrot sprzętu w umówionym oknie." },
+  { name: "Pruszków", slug: "pruszkow", lat: 52.17, lng: 20.812, customIntro: "Pruszków jest w zasięgu strefy gratis — odbiorę sprzęt spod domu lub pracy i przywiozę po naprawie." },
 ];
 
 async function main() {
@@ -86,8 +92,19 @@ async function main() {
     slug: a.slug,
     name: a.name,
     distanceKm: haversineKm(base, { lat: a.lat, lng: a.lng }).toFixed(2),
+    customIntro: a.customIntro,
   }));
-  await db.insert(serviceAreas).values(areaRows).onConflictDoNothing({ target: serviceAreas.slug });
+  await db
+    .insert(serviceAreas)
+    .values(areaRows)
+    .onConflictDoUpdate({
+      target: serviceAreas.slug,
+      set: {
+        name: sql`excluded.name`,
+        distanceKm: sql`excluded.distance_km`,
+        customIntro: sql`excluded.custom_intro`,
+      },
+    });
   console.log(`Miejscowości: ${areaRows.length}`);
 
   const adminEmail = process.env.ADMIN_EMAIL;

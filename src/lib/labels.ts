@@ -19,3 +19,21 @@ export const ZONE_LABELS: Record<string, string> = {
   DO_USTALENIA: "Poza strefą gratis — dojazd do ustalenia",
   KURIER: "Daleko — sugerujemy wysyłkę kurierem",
 };
+
+export const SERVICE_CATEGORY_LABELS: Record<string, string> = {
+  DIAGNOSTYKA: "Diagnostyka",
+  NAPRAWA: "Naprawa",
+  SERWIS_OKRESOWY: "Serwis okresowy",
+  SOFTWARE: "Oprogramowanie",
+  SKLADANIE: "Składanie i upgrade",
+  TELEFONY: "Telefony",
+};
+
+export const SERVICE_CATEGORY_ORDER = [
+  "DIAGNOSTYKA",
+  "NAPRAWA",
+  "SERWIS_OKRESOWY",
+  "SOFTWARE",
+  "SKLADANIE",
+  "TELEFONY",
+] as const;
