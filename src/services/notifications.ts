@@ -81,3 +81,26 @@ export async function notifyStatusChange(
   const r = await sendEmail(t.customerEmail, built.subject, built.element);
   await log("EMAIL", t.id, `status_${status}`, t.customerEmail, r.ok, r.error);
 }
+
+export async function notifyQuoteDecision(ticketId: string, accepted: boolean): Promise<void> {
+  const chat = process.env.TELEGRAM_CHAT_ID;
+  if (!chat) return;
+  const [t] = await db
+    .select({ code: tickets.code })
+    .from(tickets)
+    .where(eq(tickets.id, ticketId))
+    .limit(1);
+  if (!t) return;
+  const ok = await tgSendMessage(
+    chat,
+    `Klient ${accepted ? "zaakceptował" : "odrzucił"} wycenę <b>${t.code}</b>`,
+  );
+  await log(
+    "TELEGRAM",
+    ticketId,
+    accepted ? "quote_accepted" : "quote_rejected",
+    chat,
+    ok,
+    ok ? undefined : "sendMessage=false",
+  );
+}
