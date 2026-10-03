@@ -1,0 +1,93 @@
+name: image
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write   # keyless cosign signing
+
+env:
+  REGISTRY: ghcr.io/faceitall123qwe-hub
+  DB_URL: postgres://postgres:postgres@localhost:5432/serwis
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: serwis
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Static pages are rendered from the database at build time.
+      - name: prepare build database
+        env:
+          DATABASE_URL: ${{ env.DB_URL }}
+          DATABASE_SSL: disable
+          BASE_LAT: "52.321"
+          BASE_LNG: "20.9876"
+        run: |
+          node node_modules/drizzle-kit/bin.cjs push --force
+          node --import tsx src/db/seed.ts
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build
+        run: |
+          TAG=sha-${GITHUB_SHA::7}
+          printf '%s' "$DB_URL" > /tmp/db_url
+          docker build --network host --secret id=database_url,src=/tmp/db_url \
+            --build-arg DATABASE_SSL=disable \
+            --build-arg NEXT_PUBLIC_SITE_URL=http://serwis.127.0.0.1.nip.io \
+            --target run -t "$REGISTRY/serwis:$TAG" .
+          docker build --target migrate -t "$REGISTRY/serwis-migrate:$TAG" .
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/serwis:${{ env.TAG }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: push
+        run: |
+          for img in serwis serwis-migrate; do
+            docker push "$REGISTRY/$img:$TAG"
+            docker tag "$REGISTRY/$img:$TAG" "$REGISTRY/$img:main"
+            docker push "$REGISTRY/$img:main"
+            DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$REGISTRY/$img:$TAG")
+            echo "$img=$DIGEST" >> digests.txt
+          done
+          cat digests.txt
+
+      - uses: sigstore/cosign-installer@v4
+
+      - name: sign
+        run: |
+          while IFS='=' read -r _ digest; do
+            cosign sign --yes "$digest"
+          done < digests.txt

@@ -12,7 +12,8 @@ if (!process.env.DATABASE_URL) {
 
 const client = postgres(process.env.DATABASE_URL, {
   prepare: false,
-  ssl: "require",
+  // DATABASE_SSL=disable only for the throwaway Postgres used during CI image builds.
+  ssl: process.env.DATABASE_SSL === "disable" ? false : "require",
 });
 
 export const db = drizzle(client, { schema, casing: "snake_case" });
