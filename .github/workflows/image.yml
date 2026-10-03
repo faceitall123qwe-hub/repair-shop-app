@@ -89,5 +89,6 @@ jobs:
       - name: sign
         run: |
           while IFS='=' read -r _ digest; do
-            cosign sign --yes "$digest"
+            # classic .sig tags: Kyverno doesn't read the cosign v3 bundle format yet
+            cosign sign --yes --new-bundle-format=false --use-signing-config=false "$digest"
           done < digests.txt
