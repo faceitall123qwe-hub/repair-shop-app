@@ -1,0 +1,57 @@
+name: deploy-aws
+
+# Manual until the AWS stack from serwis-infra is applied.
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: eu-central-1
+  CLUSTER: serwis-prod
+  SERVICE: serwis-prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: build and push
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/serwis-prod:${{ github.sha }}
+          DATABASE_URL: ${{ secrets.BUILD_DATABASE_URL }}
+        run: |
+          printf '%s' "$DATABASE_URL" > /tmp/database_url
+          docker build --secret id=database_url,src=/tmp/database_url -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: render task definition
+        run: |
+          aws ecs describe-task-definition --task-definition "$SERVICE" \
+            --query taskDefinition > task-def.json
+
+      - id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-def.json
+          container-name: web
+          image: ${{ env.IMAGE }}
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          cluster: ${{ env.CLUSTER }}
+          service: ${{ env.SERVICE }}
+          wait-for-service-stability: true
