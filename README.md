@@ -5,7 +5,10 @@ repair request, the technician picks the device up, repairs it in the workshop a
 it back. Public site, repair-request form, customer status tracking, admin panel,
 e-mail + Telegram notifications.
 
-**Live demo:** _coming soon_ (seeded with fictional data)
+**Live demo:** https://serwis-pi.vercel.app (Vercel fra1 + Neon Postgres, fictional seed data)
+
+Admin panel: [/panel/login](https://serwis-pi.vercel.app/panel/login) — `demo@serwis.demo` / `demo-panel-2026`.
+Customer tracking: [/status](https://serwis-pi.vercel.app/status). E-mail, Telegram and Turnstile are disabled in the demo.
 
 ## Stack
 
