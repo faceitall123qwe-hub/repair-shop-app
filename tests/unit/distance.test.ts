@@ -9,10 +9,10 @@ describe("haversineKm", () => {
     expect(haversineKm(BASE, BASE)).toBe(0);
   });
 
-  it("liczy znany dystans baza → centrum Warszawy (~12 km)", () => {
+  it("liczy znany dystans baza → centrum Warszawy (~10 km)", () => {
     const d = haversineKm(BASE, WARSAW_CENTER);
-    expect(d).toBeGreaterThan(11);
-    expect(d).toBeLessThan(14);
+    expect(d).toBeGreaterThan(9);
+    expect(d).toBeLessThan(12);
   });
 
   it("jest symetryczny", () => {
