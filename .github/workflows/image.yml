@@ -84,7 +84,7 @@ jobs:
           done
           cat digests.txt
 
-      - uses: sigstore/cosign-installer@v4
+      - uses: sigstore/cosign-installer@v4.1.2
 
       - name: sign
         run: |
