@@ -1,4 +1,4 @@
-# serwis
+# repair-shop-app
 
 Website and job tracking for a small mobile computer repair business in Warsaw. A customer
 sends a repair request, I pick the device up, fix it in the workshop and bring it back.
@@ -73,8 +73,8 @@ Resend, Telegram and Turnstile are optional. Without keys they are skipped.
 
 Next.js 16 (App Router), TypeScript, Tailwind CSS 4, Drizzle ORM, PostgreSQL, Zod, argon2,
 Resend, Telegram Bot API, Vitest. The demo runs on Vercel with a Neon database.
-[serwis-platform](https://github.com/faceitall123qwe-hub/serwis-platform) runs it on Kubernetes
-with Argo CD, and [serwis-infra](https://github.com/faceitall123qwe-hub/serwis-infra) has a
+[repair-shop-k8s-platform](https://github.com/faceitall123qwe-hub/repair-shop-k8s-platform) runs it on Kubernetes
+with Argo CD, and [repair-shop-aws-terraform](https://github.com/faceitall123qwe-hub/repair-shop-aws-terraform) has a
 Terraform setup for AWS.
 
 Every push to `main` builds the container image, scans it with Trivy and signs it with cosign
