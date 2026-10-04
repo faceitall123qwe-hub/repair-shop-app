@@ -73,5 +73,9 @@ Resend, Telegram and Turnstile are optional. Without keys they are skipped.
 
 Next.js 16 (App Router), TypeScript, Tailwind CSS 4, Drizzle ORM, PostgreSQL, Zod, argon2,
 Resend, Telegram Bot API, Vitest. The demo runs on Vercel with a Neon database.
-[serwis-infra](https://github.com/faceitall123qwe-hub/serwis-infra) has a Terraform setup for
-running it on AWS instead.
+[serwis-platform](https://github.com/faceitall123qwe-hub/serwis-platform) runs it on Kubernetes
+with Argo CD, and [serwis-infra](https://github.com/faceitall123qwe-hub/serwis-infra) has a
+Terraform setup for AWS.
+
+Every push to `main` builds the container image, scans it with Trivy and signs it with cosign
+(`.github/workflows/image.yml`); the Kubernetes platform only runs images signed this way.
